@@ -1,0 +1,67 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+/docs
+
+# testing
+/coverage
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# env files (can opt-in for committing if needed)
+.env*
+testing-instructions.pdf
+Website_Issues_and_Fixes.pdf
+
+# vercel
+.vercel
+#test
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+backend/
+
+# Internal working docs — kept locally, never deployed
+CART-CONTEXT.md
+CART-RECOVERY-BACKEND.md
+GRAPHQL-CACHE-REPORT.md
+GRAPHQL-CACHE-REPORT.pdf
+GRAPHQL-CACHE-SIMPLE.html
+GRAPHQL-CACHE-SIMPLE.md
+LOYALTY-BACKEND.md
+MAGIC-LINK-BACKEND.md
+
+# Local backup archive
+elixer_next_bk_1.zip
+
+# Internal instruction/hand-off docs (see .clauderules 0.2) — never commit
+*-CONTEXT.md
+*-BACKEND.md
+*-REPORT.*
+*-INSTRUCTIONS.*
+*_Issues_and_Fixes.*
+*.zip

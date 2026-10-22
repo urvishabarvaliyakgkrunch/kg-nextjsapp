@@ -1,0 +1,305 @@
+@import "tailwindcss";
+
+/* ── Tailwind v4: static design tokens ── */
+@theme {
+  /* Brand */
+  --color-blue:       #0165FF;
+  --color-blue-alt:   #3473FB;
+  --color-blue-bg:    #F5F8FF;
+
+  /* Text */
+  --color-ink:        #1A1A1A;
+  --color-ink-dark:   #0A0A0A;
+  --color-black:      #000000;
+  --color-muted:      #8A8A85;
+  --color-muted-alt:  #707070;
+
+  /* Surfaces */
+  --color-cream:      #F5F5F2;
+  --color-gray-light: #EEEEEE;
+  --color-dark:       #111111;
+  --color-dark-alt:   #0A0A0A;
+
+  /* Accent */
+  --color-star:       #CCA43B;
+  --color-green-bg:   #E9F9F0;
+  --color-success:    #16965B;
+  --color-danger:     #D55B4E;
+
+  /* How we're different — extracted from live compare table */
+  --color-cmp-label:       #71819A;
+  --color-cmp-rule:        #E1EBF6;
+  --color-cmp-rule-hover:  #B7D7F7;
+  --color-cmp-text:        #26364E;
+  --color-cmp-text-hover:  #172033;
+  --color-cmp-icon:        #2D78C4;
+  --color-cmp-icon-hover:  #1268C2;
+  --color-cmp-icon-line:   #C8DEF5;
+  --color-cmp-icon-tint:   #E5F2FF;
+  --color-cmp-accent:      #2E82DC;
+  --color-cmp-brand:       #1268C2;
+  --color-cmp-brand-tint:  #DFF1FF;
+  --color-cmp-brand-line:  #8FC3F4;
+  --color-cmp-sub:         #71839B;
+  --color-cmp-vendor:      #61748C;
+  --color-cmp-check-line:  #9FE1BD;
+  --color-cmp-check-tint:  #EFFFF7;
+  --color-cmp-cross:       #831010;
+  --color-cmp-cross-line:  #E2B2B2;
+  --color-cmp-cross-tint:  #FCE7E7;
+
+  /* Featured Lot — extracted from live */
+  --color-lot-body:       #5A5A57;
+  --color-lot-pass:       #268864;
+  --color-lot-border:     #E4E4E4;
+
+  /* Research-use band ("For Research Use Only") — extracted from live */
+  --color-ruo-bg:         #FAFAF9;
+  --color-ruo-border:     #E5E5E2;
+
+  /* Page hero (COAs / shared inner pages) — extracted from live */
+  --color-hero-surface:   #FAFAF8;
+  --color-hero-border:    #EDEDED;
+  --color-hero-dot:       #0066FF;
+  --color-hero-dot-ring:  rgba(0, 102, 255, 0.12);
+
+  /* How we verify (COAs) — extracted from live */
+  --color-verify-pill-bg:   #F1F1ED;
+  --color-verify-pill-text: #7A7A7A;
+  --color-field-border:     #DADADA;
+  --color-field-label:      #333333;
+  --color-blue-hover:       #004ECC;
+  --color-mail-link:        #3366FF;
+
+  /* Contact page — extracted from live */
+  --color-contact-icon-bg:  #EBF3FE;
+  --color-required:         #FF0000;
+
+  /* Research library — extracted from live */
+  --color-pubmed-bg:        #F0F0F0;
+  --color-card-glow:        rgba(1, 101, 255, 0.49);
+
+  /* Verification pages (lab partner, quality standards) — extracted from live */
+  --color-pill-line:        #A1A1A1;
+
+  /* Policy pages (privacy, terms, shipping, refund) — extracted from live */
+  --color-legal-callout:    #F4F4F2;
+  --color-legal-rule:       #E6E6E6;
+
+  /* Product page — extracted from live Elementor template 7009 */
+  --color-line:         #E5E5E2;
+  --color-outline:      #C7C7C2;
+  --color-bundle:       #0066FF;
+  --color-bundle-deep:  #0052CC;
+  --color-save:         #2563EB;
+  --color-atc-hover:    #0156D9;
+  --color-muted-2:      #7A7A7A;
+  --color-marker:       #0000FF;
+  --color-chip-text:    #444444;
+  --color-chip-ok:      #458C5B;
+  --color-chip-ok-bg:   #F4F8F8;
+  --color-chip-ok-line: #9FC9B6;
+  --color-pdp-star:     #F7BF33;
+  --radius-gallery:     16px;
+
+  /* Side cart — extracted from live */
+  --color-ship-bg:       rgba(1, 101, 255, 0.09);
+  --color-ship-track:    #E2D9C8;
+  --color-ship-ok-bg:    #E8F6EE;
+  --color-ship-ok-line:  rgba(21, 127, 75, 0.28);
+  --color-ship-ok:       #157F4B;
+  --color-ship-ok-bar:   #157F4B;
+  --color-step-line:     #CFCFCF;
+  --color-tier-line:     #CFCFCF;
+  --color-fbt-line:      #F0F0F0;
+
+  /* Cart page — extracted from live */
+  --color-cart-line:     #D8D8D8;
+  --color-row-line:      #D5D8DC;
+  --color-input-bg:      #F8F9F9;
+  --color-placeholder:   #A9ADAD;
+  --color-blue-soft:     #80B2FF;
+  --color-muted-ship:    #69727D;
+  --color-loyalty:       #9CC21D;
+  --color-loyalty-star:  #9CC21D;
+
+  /* Points & rewards — the dashed coupon chip on the Coupons tab */
+  --color-coupon-bg:     #FDF3EC;
+  --color-coupon-line:   #E8B48A;
+  --color-coupon-text:   #E07B39;
+  /* Activity table header strip */
+  --color-table-head:    #D9D9D9;
+
+  /* Product sections — extracted from live */
+  --color-ref-line:    #E2E2E2;
+  --color-ref-blue:    #146BFB;
+  --color-ref-meta:    #9A9A9A;
+  --color-ref-author:  #6B6B6B;
+  --color-ref-title:   #111111;
+  --color-coa-label:   #8A8A8A;
+  --color-coa-value:   #222222;
+  --color-coa-pass:    #4E9A63;
+  --color-coa-rule:    #DCDCDC;
+  --color-faq-body:    #555555;
+  --color-review-cta:  #645CFC;
+
+  /* Bottom-centre notice toast — exact #111 from the WP "NOTICE BAR TOAST" snippet */
+  --color-toast-bg:    #111111;
+
+  /* Age / RUO gate — exact values from the live WP age-gate.css.
+     It is the one dark screen on the site, so it keeps its own tokens. */
+  --color-gate-overlay:       rgba(10, 10, 10, 0.98);
+  --color-gate-line:          rgba(245, 245, 242, 0.10);
+  --color-gate-body:          rgba(245, 245, 242, 0.78);
+  --color-gate-blue:          #0066FF;
+  --color-gate-blue-line:     rgba(0, 102, 255, 0.55);
+  --color-gate-blue-bg:       rgba(0, 102, 255, 0.10);
+  --color-gate-field:         #111111;
+  --color-gate-field-line:    rgba(245, 245, 242, 0.20);
+  /* The live email box borders grey, not cream — the WP theme's input rule wins there */
+  --color-gate-input-line:    #666666;
+  --color-gate-placeholder:   rgba(245, 245, 242, 0.35);
+  --color-gate-check-line:    rgba(245, 245, 242, 0.40);
+  --color-gate-error:         #D50E0E;
+  --color-gate-foot:          rgba(245, 245, 242, 0.40);
+  --color-gate-off:           rgba(245, 245, 242, 0.10);
+  --color-gate-off-text:      rgba(245, 245, 242, 0.35);
+
+  /* Gate fades in once; the eyebrow dot keeps breathing while it is open */
+  --animate-gate-in:   gate-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-gate-dot:  gate-dot 2.4s infinite;
+
+  /* Skeleton shimmer — Tailwind v4 builds the `animate-shimmer` utility from this */
+  --animate-shimmer:  shimmer 1.6s linear infinite;
+
+  /* Holds the click spinner invisible for ~100ms so quick pages never flash it */
+  --animate-pending-fade: pending-fade 260ms ease-out both;
+
+  /* Top-of-page bar that slides while the next route loads */
+  --animate-route-progress: route-progress 1.1s ease-in-out infinite;
+
+  /* Border radius */
+  --radius-pill:      50px;
+  --radius-card:      8px;
+  --radius-img:       12px;
+  --radius-btn:       6px;
+  --radius-chip:      4px;
+}
+
+/* ── Fonts: resolved at runtime from next/font CSS vars ── */
+@theme inline {
+  --font-sans:    var(--font-inter), sans-serif;
+  --font-display: var(--font-space-grotesk), sans-serif;
+  --font-mono:    var(--font-jetbrains-mono), monospace;
+}
+
+/* ── Tailwind v4 resets buttons to the default cursor; restore the pointer once here ── */
+@layer base {
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+}
+
+/* ── Layout constants — exact from live site ── */
+:root {
+  --header-height:     68px;
+  --bar-height:        32px;   /* blue marquee bar */
+  --disclaimer-height: 33px;   /* dark research-use bar */
+  --gap:               60px;   /* --g: 3.75rem — hero/section gap */
+  --hero-bar-height:   88px;   /* --bar: 5.5rem — hero trust strip */
+  --max-width:         1380px;
+  --px-desktop:        40px;
+  --px-mobile:         16px;
+  --chrome-height:     calc(var(--header-height) + var(--bar-height) + var(--disclaimer-height));
+}
+
+@media (max-width: 768px) {
+  :root {
+    --header-height: 60px; /* matches Header mobile */
+  }
+}
+
+/* ── Base ── */
+body {
+  font-family: var(--font-sans);
+  color: var(--color-ink);
+  background: #ffffff;
+  font-size: 14px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+}
+
+/* ── Announcement bar marquee ── */
+@keyframes marquee {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee 46s linear infinite;
+}
+
+.marquee-track:hover {
+  animation-play-state: paused;
+}
+
+/* ── Loading skeletons ── */
+/* Slides a light band across the grey block so it reads as "still loading" */
+@keyframes shimmer {
+  from { background-position: 200% 0; }
+  to   { background-position: -200% 0; }
+}
+
+@keyframes route-progress {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(400%); }
+}
+
+@keyframes pending-fade {
+  0%, 40% { opacity: 0; }
+  100%    { opacity: 1; }
+}
+
+@keyframes gate-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes gate-dot {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.4; }
+}
+
+/* Moving boxes make some people feel sick — show them a plain grey block */
+@media (prefers-reduced-motion: reduce) {
+  [data-skeleton] {
+    animation: none;
+  }
+}
+
+/* ── Container utility ── */
+.container-site {
+  max-width: var(--max-width);
+  margin-inline: auto;
+  padding-inline: var(--px-desktop);
+}
+
+@media (max-width: 768px) {
+  .container-site {
+    padding-inline: var(--px-mobile);
+  }
+}
+
+/* Header inner row — mobile padding */
+@media (max-width: 768px) {
+  .header-row {
+    padding-inline: var(--px-mobile) !important;
+  }
+}

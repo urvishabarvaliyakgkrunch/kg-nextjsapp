@@ -1,0 +1,1130 @@
+# Elixser Peptides — Project Rules
+# Next.js 14 + TypeScript + Tailwind + WooCommerce Headless
+
+# ═════════════════════════════════════════════
+# SECTION 0: HARD RULES — read first, no exceptions
+# ═════════════════════════════════════════════
+
+## 0.1 NEVER place a Tagada order
+
+  The user places every Tagada order themselves, by hand. Never complete one.
+
+  NOT ALLOWED:
+  - Clicking "Complete Purchase" / "Pay" on a Tagada hosted checkout page
+  - Submitting payment details, card numbers or test cards anywhere on Tagada
+  - Any step whose next click would create an order
+
+  ALLOWED (needed to build and debug):
+  - The tracker's session calls (/session/anonymous, /session/v2/init, /funnel/initialize)
+  - /funnel/navigate — this returns a checkout URL, it does not create an order
+  - Opening that checkout URL and READING the page to verify products and totals
+
+  If a check cannot be done without ordering, stop and hand it to the user with
+  the exact steps instead of doing it.
+
+## 0.2 Internal / instruction files NEVER go to git
+
+  The client does not need our working docs. Anything you create that is an
+  instruction, guide, report, context note, or backend hand-off (PDF, DOC/DOCX,
+  MD, HTML export, ZIP, plugin zips, etc.) is for us only.
+
+  RULE: the moment you create such a file, add it to .gitignore in the SAME step
+  (exact filename, under "Internal working docs"). Never commit or stage it.
+
+  Examples: *-CONTEXT.md, *-BACKEND.md, *-REPORT.*, testing-instructions.pdf,
+  Website_Issues_and_Fixes.pdf, /backend, /docs, local backup zips.
+  Real source code (src/, public/) is the only thing that gets committed.
+
+# ─────────────────────────────────────────────
+# SECTION G: DESIGN SYSTEM — PIXEL PERFECT (extracted live from elixserpeptides.com)
+# Rule: match the live site exactly. No guessing, no approximation.
+# ─────────────────────────────────────────────
+
+## G1. Color Tokens — use these exact values, no hardcoding elsewhere
+
+  /* Brand */
+  --color-blue:          #0165FF   /* primary brand blue — announcement bar, links, accents */
+  --color-blue-alt:      #3473FB   /* slightly lighter blue — some hover states */
+  --color-blue-bg:       #F5F8FF   /* light blue tint — subtle section backgrounds */
+
+  /* Text */
+  --color-ink:           #1A1A1A   /* primary body text */
+  --color-ink-dark:      #0A0A0A   /* headings, product titles, dark CTAs */
+  --color-black:         #000000   /* pure black — hero CTA button bg */
+  --color-muted:         #8A8A85   /* secondary / helper text */
+  --color-muted-alt:     #707070   /* --c-light in original — captions, meta */
+
+  /* Surfaces */
+  --color-white:         #FFFFFF   /* default page background, cards */
+  --color-cream:         #F5F5F2   /* off-white — subtle section bg, age gate dark surface */
+  --color-gray-light:    #EEEEEE   /* dividers, borders */
+  --color-dark:          #111111   /* dark section backgrounds */
+  --color-dark-alt:      #0A0A0A   /* near-black — nav bar, CTA button */
+
+  /* Accent */
+  --color-star:          #CCA43B   /* star / gold rating color */
+  --color-green-bg:      #E9F9F0   /* light green tint — success / badge bg */
+
+  RULE: Define all of these in src/app/globals.css as :root CSS variables.
+        In Tailwind config, extend colors to reference these vars.
+        Never use a hex code directly in a component — always use the token name.
+
+## G2. Typography — Fonts
+
+  FONT STACK:
+  --f-body:   "Inter", sans-serif           → body text, nav, UI labels
+  --f-head:   "Space Grotesk", sans-serif   → all headings (h1–h4), product names
+  --f-mono:   "JetBrains Mono", monospace   → eyebrow labels, tags, small UPPERCASE caps
+
+  LOADING (next/font — NOT Google Fonts <link>):
+    - Inter:          weights 400, 500, 600, 700, 800, 900
+    - Space Grotesk:  weights 400, 500, 600, 700, 800, 900
+    - JetBrains Mono: weights 400, 500, 600  (for labels only)
+
+  src/app/layout.tsx — load all three via next/font/google, assign as CSS variables.
+
+## G3. Type Scale — exact values from live site
+
+  H1  — Space Grotesk  700   40px   line-height: 42px   letter-spacing: -2px
+  H2  — Space Grotesk  700   36px   line-height: 37.8px letter-spacing: -0.9px
+  H3  — Space Grotesk  700   20px   line-height: normal letter-spacing: -0.44px  (product titles)
+  H4  — Inter          700   14px   line-height: normal letter-spacing: -0.44px
+
+  body        — Inter  400   14px   line-height: 22.4px (1.6)   color: --color-ink
+  body-large  — Inter  400   16px   line-height: 1.6
+
+  eyebrow / label  — JetBrains Mono  500   11px  letter-spacing: 2.2px   UPPERCASE  color: --color-blue
+  micro label      — JetBrains Mono  500   10px  letter-spacing: 1.4px   UPPERCASE  color: --color-muted
+
+  price (product)  — Inter  700   16px   color: --color-ink-dark
+  price (cart)     — Inter  500   14px   color: --color-white
+
+## G4. Border Radius — exact values
+
+  --radius-pill:   50px   /* primary hero CTA buttons (Shop Now, Read FAQ) */
+  --radius-card:   8px    /* cards, containers */
+  --radius-img:    12px   /* product images in card */
+  --radius-btn:    6px    /* cart button, secondary buttons */
+  --radius-sm:     4px    /* small UI elements, chips */
+  --radius-xs:     3px    /* tiny UI (add-to-cart plugin remnant — use 4px for new elements) */
+
+## G5. Button Styles — exact from live site
+
+  PRIMARY CTA (hero — "Shop Now", "Read FAQ"):
+    background:     #000000
+    color:          #FFFFFF
+    border-radius:  50px  (--radius-pill)
+    padding:        16px 38px
+    font:           Inter  600  16px
+    border:         none
+
+  NAV / HEADER button (Cart):
+    background:     #0A0A0A
+    color:          #FFFFFF
+    border:         1px solid #697275
+    border-radius:  6px  (--radius-btn)
+    padding:        12px 24px
+    font:           Inter  500  14px
+
+  SECONDARY / OUTLINE (if needed):
+    background:     transparent
+    color:          #0A0A0A
+    border:         1px solid #0A0A0A
+    border-radius:  50px  (--radius-pill)
+    padding:        16px 38px
+    font:           Inter  600  16px
+
+  FILTER TABS (All Products / GLPs / Peptides):
+    active:   bg #0165FF  color #FFFFFF  border-radius: 4px  font: Inter 600 13px
+    inactive: bg transparent  color #1A1A1A  border-radius: 4px
+
+## G6. Layout & Spacing Tokens
+
+  --header-height:  64px   (--hdr: 4rem)
+  --gap:            60px   (--g: 3.75rem — section/column gap)
+  --bar-height:     88px   (--bar: 5.5rem — announcement bar row)
+
+  MAX WIDTHS (from WordPress theme):
+    content:  800px   (--wp--style--global--content-size)
+    wide:     1200px  (--wp--style--global--wide-size)
+    → IGNORE the theme values above. The live Elementor layout caps content at
+      1440px (.e-con-inner { max-width: 1440px }) — measured on elixserpeptides.com.
+      Use 1440px as max container width. Padding: 0 40px (desktop), 0 16px (mobile)
+
+  SECTION PADDING:  60px top/bottom on desktop, 40px on mobile
+
+## G7. Announcement / Top Bar
+
+  background:   #0165FF  (--color-blue)
+  color:        #FFFFFF
+  font:         Inter  500  12px  letter-spacing: 0.5px
+  height:       auto (scrolling marquee)
+  content:      "SAME DAY SHIPPING ON ORDERS BY 4PM PST · USA MADE · USA SHIPPED · FREE SHIPPING ON ORDERS OVER $100 · 4.9/5 STARS"
+
+## G8. Header / Navigation
+
+  Header bar background:   #FFFFFF
+  Header total height:      ~133px (announcement bar + nav bar combined)
+  Nav bar height:           64px
+  Logo:                     text "ELIXSER" in Inter 700 + icon (= or hamburger for mobile)
+  Nav links:                Inter  600  14px  color: #333333  padding: 13px 20px
+  Nav links (active/hover): color: #0165FF
+  Cart icon:                dark button bg #0A0A0A, border 1px solid #697275, radius 6px
+
+  STICKY: header sticks on scroll (position: sticky, top: 0, z-index: 50)
+
+## G9. Product Card (Shop page)
+
+  Card background:    transparent (sits on white page bg)
+  Card border:        none
+  Card radius:        0px (no card wrapper border-radius — image has its own)
+
+  Product image:      border-radius: 12px  (--radius-img)
+  Product title:      Space Grotesk  700  20px  letter-spacing: -0.44px  color: #0A0A0A
+  Product eyebrow:    JetBrains Mono  500  11px  UPPERCASE  letter-spacing: 2.2px  color: #0165FF
+  Product price:      Inter  700  16px  color: #0A0A0A
+  Add to cart btn:    (see G5 — secondary style or icon button)
+
+## G10. Sections with Colored Backgrounds
+
+  Announcement bar:   #0165FF (blue)
+  Hero section:       #FFFFFF (white page bg) with large product image
+  Featured section:   #FFFFFF
+  Dark/contrast sections: #111111 (use for callout / trust badges area)
+  Subtle highlight bg (blue):  #F5F8FF
+  Subtle highlight bg (green): #E9F9F0
+
+## G11. Icons & Stars
+
+  Star color:    #CCA43B  (--color-star)
+  Star font/SVG: filled stars for rating display
+  Rating label:  Inter  600  10px  letter-spacing: 0.6px  color: #1A1A1A
+
+## G12. Responsive Breakpoints (Tailwind)
+
+  sm:   640px   → small phones
+  md:   768px   → tablets
+  lg:   1024px  → desktop
+  xl:   1280px  → wide desktop
+  2xl:  1536px  → ultra wide (rarely needed)
+
+  Mobile-first: write base styles for mobile, override at md: and lg:
+
+# ─────────────────────────────────────────────
+# SECTION H: ENVIRONMENTS & API SETUP
+# ─────────────────────────────────────────────
+
+## H1. Environment URLs
+
+  LOCAL (development):
+    WordPress backend:   http://localhost.elixerpeptides-backend.com
+    GraphQL endpoint:    http://localhost.elixerpeptides-backend.com/graphql
+    WC REST base:        http://localhost.elixerpeptides-backend.com/wp-json/wc/v3
+    WP REST base:        http://localhost.elixerpeptides-backend.com/wp-json/wp/v2
+    Store API base:      http://localhost.elixerpeptides-backend.com/wp-json/wc/store/v1
+    Next.js dev:         http://localhost:3000
+
+  PRODUCTION (live — add when client provides):
+    WordPress backend:   https://elixserpeptides.com         ← to be confirmed
+    GraphQL endpoint:    https://elixserpeptides.com/graphql  ← to be confirmed
+    WC REST base:        https://elixserpeptides.com/wp-json/wc/v3
+    Next.js live:        TBD (Vercel / client hosting)
+
+## H2. Environment Variables — .env.local (never commit this file)
+
+  # ── Backend URLs ──────────────────────────────────
+  NEXT_PUBLIC_WP_URL=http://localhost.elixerpeptides-backend.com
+  NEXT_PUBLIC_GRAPHQL_URL=http://localhost.elixerpeptides-backend.com/graphql
+
+  # ── WooCommerce REST API keys (read-only) ─────────
+  # Generate in: WP Admin → WooCommerce → Settings → Advanced → REST API
+  # Permission: Read only (shop pages don't need write)
+  WC_CONSUMER_KEY=ck_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+  WC_CONSUMER_SECRET=cs_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+  # ── Site config ───────────────────────────────────
+  NEXT_PUBLIC_SITE_URL=http://localhost:3000
+
+  For production: duplicate above with live values in hosting env (Vercel env vars)
+  For each env: LOCAL / PREVIEW / PRODUCTION — set separately in Vercel dashboard
+
+## H3. API Strategy — WPGraphQL (recommended) vs WC REST API
+
+  THIS PROJECT USES: WPGraphQL + WooGraphQL (GraphQL approach)
+
+  WHY GRAPHQL over REST:
+  - Fetch only the exact fields needed (faster, smaller payloads)
+  - One request = product + variations + images + categories (REST = multiple requests)
+  - No over-fetching — product card needs 5 fields, REST returns 80+ fields
+  - Better for shop listing pages (46 products, each with variants)
+  - embodypeptides.com (reference site) likely uses the same approach
+
+  REQUIRED WORDPRESS PLUGINS (must be installed on backend):
+  ┌─────────────────────────────┬─────────────────────────────────────────────┐
+  │ Plugin                      │ Purpose                                     │
+  ├─────────────────────────────┼─────────────────────────────────────────────┤
+  │ WPGraphQL                   │ GraphQL endpoint at /graphql                │
+  │ WPGraphQL for WooCommerce   │ Adds WC types (Product, Variation, Cart)    │
+  │   (wp-graphql-woocommerce)  │ to the GraphQL schema                       │
+  └─────────────────────────────┴─────────────────────────────────────────────┘
+
+  CHECK IF INSTALLED:
+    Visit: http://localhost.elixerpeptides-backend.com/graphql
+    If returns JSON with "data" key → WPGraphQL is active
+    If 404 → plugin not installed, install first
+
+  INSTALL (if missing):
+    WP Admin → Plugins → Add New → search "WPGraphQL" → install both plugins above
+
+## H4. GraphQL Client Setup in Next.js
+
+  Use: plain fetch() with POST to /graphql — no extra library needed (Next.js fetch = cached)
+  Do NOT use: Apollo Client, urql, graphql-request for server components
+  Why: Next.js built-in fetch has ISR/caching built-in. Adding Apollo = extra bundle size.
+
+  PATTERN for server components (src/lib/graphql.ts):
+
+    const query = async (gql: string, variables = {}) => {
+      const res = await fetch(process.env.NEXT_PUBLIC_GRAPHQL_URL!, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query: gql, variables }),
+        next: { revalidate: 3600 }, // ISR — rebuild every 1 hour
+      });
+      const json = await res.json();
+      if (json.errors) throw new Error(json.errors[0].message);
+      return json.data;
+    };
+
+  For MUTATIONS (cart, auth) → use from client components with no cache:
+    fetch(url, { method: "POST", cache: "no-store", ... })
+
+## H5. WC REST API — when to use it (fallback / specific cases)
+
+  Use WC REST API (not GraphQL) for:
+  - Applying coupons to Woo cart (before Tagada redirect — §A7)
+  - Admin-only operations (no WPGraphQL equivalent)
+  - Cart mutations if WooGraphQL cart is not set up
+
+  WC REST API auth (server-side only — never expose keys in browser):
+    const WC_AUTH = Buffer.from(
+      `${process.env.WC_CONSUMER_KEY}:${process.env.WC_CONSUMER_SECRET}`
+    ).toString("base64");
+
+    fetch(`${process.env.NEXT_PUBLIC_WP_URL}/wp-json/wc/v3/products`, {
+      headers: { Authorization: `Basic ${WC_AUTH}` },
+    });
+
+  This code goes in src/lib/woocommerce.ts — server-only file.
+
+## H6. GraphQL Call Rules — How and When to Call
+
+  GOLDEN RULE: 1 page = 1 GraphQL call. Components never fetch — they only receive props.
+
+  ── Call count per page ──────────────────────────────────────────────
+  Homepage      → 1 call  (hero + featured products + announcement bar)
+  Shop page     → 1 call  (products + categories together)
+  Product page  → 1 call  (product + variations + gallery together)
+  Cart page     → 0 server calls (Zustand client state, no GraphQL needed)
+  Cart mutation → 1 call  (client component, noCache)
+  Nav + Page    → 2 PARALLEL calls via Promise.all (independent concerns)
+
+  ── Who is allowed to call GraphQL ──────────────────────────────────
+  ✅ src/app/*/page.tsx          → server component, calls query function ONCE
+  ✅ src/app/*/layout.tsx        → for nav/footer global data only
+  ✅ src/hooks/use*.ts           → client-side mutations (cart, auth)
+  ❌ src/components/**/*         → NEVER — receives props only
+  ❌ Inline in JSX               → NEVER — no fetch() inside return()
+
+  ── Base fetch function: src/lib/graphql.ts ─────────────────────────
+  One function handles all calls. Accepts revalidate or noCache option.
+
+    export async function gql<T>(
+      query: string,
+      variables: Record<string, unknown> = {},
+      options: { revalidate?: number; noCache?: boolean } = {}
+    ): Promise<T> {
+      const res = await fetch(process.env.NEXT_PUBLIC_GRAPHQL_URL!, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query, variables }),
+        next: options.noCache
+          ? { revalidate: 0 }                            // cart/auth — always fresh
+          : { revalidate: options.revalidate ?? 3600 },  // default 1 hour ISR
+      });
+      const json = await res.json();
+      if (json.errors) throw new Error(json.errors[0].message);
+      return json.data as T;
+    }
+
+  ── Folder structure for queries ────────────────────────────────────
+  src/lib/queries/
+  ├── fragments.ts    ← reusable field sets (ProductCardFields, VariationFields)
+  ├── homepage.ts     ← getHomepageData()
+  ├── shop.ts         ← getShopPageData()
+  ├── product.ts      ← getProductBySlug(slug)
+  ├── global.ts       ← getGlobalNav(), getFooter() — site-wide
+  └── cart.ts         ← ADD_TO_CART, UPDATE_CART mutations
+
+  Rule: every exported function in queries/ wraps gql() with a named query string.
+        No raw gql() calls anywhere except inside queries/ files.
+
+  ── Fragments: avoid duplicating fields ─────────────────────────────
+  PRODUCT_CARD_FIELDS  → used in homepage + shop (same product card fields)
+  VARIATION_FIELDS     → used in product page + cart
+  Define once in fragments.ts, import with template literal: `${PRODUCT_CARD_FIELDS}`
+
+  ── Cache values by data type ────────────────────────────────────────
+  { revalidate: 86400 }  → 24 hours  — homepage sections, global nav/footer
+  { revalidate: 3600  }  → 1 hour    — shop listing, product detail, categories
+  { noCache: true     }  → no cache  — cart mutations, auth, coupon apply
+
+  ── Parallel calls: only when truly independent ──────────────────────
+  const [product, nav] = await Promise.all([
+    getProductBySlug(slug),   // product data
+    getGlobalNav(),           // separate cache, separate concern
+  ]);
+  Never await one then the other if they don't depend on each other — waterfall = slow.
+
+  ── Page file pattern (always thin) ──────────────────────────────────
+  // src/app/shop/page.tsx
+  import { getShopPageData } from "@/lib/queries/shop"
+  import ProductGrid from "@/components/shop/ProductGrid"
+  import CategoryFilter from "@/components/shop/CategoryFilter"
+
+  export default async function ShopPage() {
+    const data = await getShopPageData()           // ← 1 call, all data
+    return (
+      <>
+        <CategoryFilter categories={data.productCategories.nodes} />
+        <ProductGrid products={data.products.nodes} />
+      </>
+    )
+  }
+  // No logic here. No second fetch. Components get props, nothing else.
+
+## H6b. Key GraphQL Queries to Write (in src/lib/queries/)
+
+  FILE: src/lib/queries/products.ts
+  - GET_PRODUCTS          → shop page listing (id, slug, name, price, image, categories)
+  - GET_PRODUCT_BY_SLUG   → product detail page (+ variations, gallery, description)
+  - GET_PRODUCT_CATEGORIES → category filter list
+
+  FILE: src/lib/queries/homepage.ts
+  - GET_HOMEPAGE_DATA     → featured products, hero content (from WP page/ACF)
+
+  FILE: src/lib/queries/cart.ts  (if using WooGraphQL cart)
+  - ADD_TO_CART, UPDATE_CART, REMOVE_FROM_CART, GET_CART
+
+  Rule: all GraphQL query strings live in src/lib/queries/ — never inline in a component or page.
+
+## H6b. Dynamic Content Rule — Nothing is Static in Next.js
+
+  RULE: Every piece of content visible on the site must come from WordPress admin.
+        Zero hardcoded text, images, or data in Next.js component or page files.
+
+  WHAT THIS MEANS:
+  - Hero headline, subtext, button label        → ACF/SCF field on the Homepage
+  - Section titles, body copy, images           → ACF/SCF field on each page
+  - Nav links, footer links, footer text        → WordPress Menu or ACF field
+  - Announcement bar text                       → ACF/SCF field (admin changes it anytime)
+  - Product data (name, price, image, desc)     → WooCommerce via WPGraphQL (auto)
+  - Trust badges, feature callouts, icons text  → ACF/SCF field
+  - FAQ content, Education section              → ACF/SCF field or WP posts
+
+  HOW:
+  - Install plugin: "Secure Custom Fields" (SCF — free ACF fork) on WordPress
+  - Install plugin: "WPGraphQL for ACF" → exposes all SCF/ACF fields to GraphQL schema
+  - Create field groups in WP Admin → SCF → Field Groups, assign to Pages/Options
+  - For site-wide fields (nav, footer, announcement bar) → use ACF Options Page
+
+  REQUIRED WORDPRESS PLUGINS (add to H3 list):
+  ┌──────────────────────────────┬───────────────────────────────────────────────┐
+  │ Secure Custom Fields (SCF)   │ Custom fields on any page/post/option         │
+  │ WPGraphQL for ACF            │ Exposes SCF/ACF fields in the GraphQL schema  │
+  │ ACF Options Page (built-in)  │ Site-wide fields (nav, footer, announcement)  │
+  └──────────────────────────────┴───────────────────────────────────────────────┘
+
+  GRAPHQL QUERY PATTERN for page content:
+    query GetHomepage {
+      page(id: "home", idType: URI) {
+        homepage {                        # ← SCF field group name
+          heroHeadline
+          heroSubtext
+          heroCtaLabel
+          heroCtaUrl
+          heroImage { sourceUrl altText }
+          announcementBarText
+          featuredProducts { ... }
+        }
+      }
+    }
+
+  NAMING CONVENTION for SCF field groups:
+  - Group name = page/section (e.g. "Homepage", "Shop Page", "Footer", "Global")
+  - Field names = camelCase (heroHeadline, not hero_headline)
+    → WPGraphQL exposes them in camelCase automatically
+
+  NEVER DO THIS in any Next.js file:
+    <h1>Made in USA. 99% Purity. Lab Verified.</h1>   ← hardcoded = wrong
+    const navLinks = ["Shop", "COAs", "Research"]      ← hardcoded = wrong
+    src="/images/hero-banner.jpg"                       ← hardcoded = wrong
+
+  ALWAYS DO THIS:
+    <h1>{data.homepage.heroHeadline}</h1>              ← from GraphQL
+    {menuItems.map(item => <NavLink ... />)}            ← from WP Menu via GraphQL
+    <Image src={data.homepage.heroImage.sourceUrl} />  ← from WP Media via GraphQL
+
+## H7. Confirming the setup works (first thing to do before any component work)
+
+  STEP 1: Visit http://localhost.elixerpeptides-backend.com/graphql in browser
+    → Should return: {"data":null,"errors":[{"message":"GraphQL Request must include..."}]}
+    → That JSON response = WPGraphQL is active ✓
+
+  STEP 2: Test a basic product query (use GraphiQL or Postman):
+    POST http://localhost.elixerpeptides-backend.com/graphql
+    Body: { "query": "{ products(first: 3) { nodes { id name slug } } }" }
+    → Returns 3 products = WooGraphQL is active ✓
+
+  STEP 3: If either fails → install the missing plugin before writing any Next.js code
+
+# ─────────────────────────────────────────────
+# SECTION A: PROJECT ARCHITECTURE RULES
+# ─────────────────────────────────────────────
+
+## A1. Backend stays WordPress — never move logic to Next.js
+- WordPress + WooCommerce = data, pricing, order creation, plugins
+- Next.js = display only (catalog, PDP, cart UI, checkout trigger)
+- Never replicate server-side plugin logic in Next.js (pricing, points calc, etc.)
+
+## A2. Tagada is the checkout and pricing authority
+- Checkout = redirect to Tagada hosted page (never build a custom checkout form)
+- Never send price/name/image to Tagada — it reads from its own catalog
+- Always carry `variation_id` (not `product_id`) on every cart line
+- Tagada checkout trigger lives in `src/lib/tagada.ts` only
+
+## A3. Cart to Tagada handoff — one-way, fire-once
+- Cart → Tagada is a snapshot at checkout click. No callback, no sync back.
+- Build cart payload: `[{ externalVariantId: variation_id, quantity }]` + `discountCodes` + `customer` + tracking metadata
+- On return `?tgd_success=1` → clear the Zustand cart
+
+## A4. Return page = one contract for all tracking
+- One shared return page handles: Attentive, Pixel/GA4, Omnisend, Loyalty points
+- Carry: `orderId`, `orderTotal`, `email`, `phone`, line items, `transaction_id`
+- Fire `purchase` event from ONE source only (prefer Tagada server-side) — never fire it twice
+
+## A5. Auth needed for wholesale prices and loyalty
+- Implement JWT auth so Next.js session maps to WP user/email
+- Without auth: wholesale prices and loyalty points will attribute wrongly
+- Guest orders link back by billing email (handled server-side already)
+
+## A6. Bundle product model — never show a free quantity field
+- All products are variable; `pa_mg` attribute = 1 / 2 / 3-vial tiers
+- Cart must show a tier stepper (swap between variations), NOT a free qty input
+- Stepper logic: remove current line → add adjacent variation line
+
+## A7. WooCommerce loyalty coupon must apply before checkout
+- Apply loyalty reward coupon through Woo cart (so `woocommerce_applied_coupon` fires)
+- This triggers the Elixser Rewards mirror to Tagada promotions automatically
+- Pass the coupon in `discountCodes` array in the Tagada payload
+
+## A8. No custom REST endpoints without documenting them
+- Any new WP custom REST endpoint (`register_rest_route`) → document it in CLAUDE.md §7
+- These live in the Elixser Rewards Custom plugin on the WordPress side
+
+# ─────────────────────────────────────────────
+# SECTION B: CODE QUALITY RULES
+# ─────────────────────────────────────────────
+
+## B1. File size limit — 200 lines max
+- Hard limit: 200 lines per file. Over 200 = split the file.
+- Split by extracting: sub-components into their own files, helpers into lib/, hooks into hooks/
+- Exception: auto-generated files (next.config.ts, etc.)
+
+## B2. Component-first — no copy-paste markup
+- Every repeating UI piece = its own component file
+- One component per file. File name = component name (PascalCase)
+- Even a small reusable button with special logic = its own file in src/components/ui/
+
+## B3. Path comment — first line of every file
+- Line 1 of every file must be a comment showing its own path (relative to src/)
+- This lets any developer instantly know where the file lives
+
+  EXAMPLES:
+    // src/components/shop/ProductCard.tsx
+    // src/lib/woocommerce.ts
+    // src/store/cart.ts
+    // src/hooks/useCart.ts
+
+## B4. Comments — simple English, one line, WHY not WHAT
+- Write a comment only when the WHY is not obvious from the code
+- Use plain simple English — any developer must understand it
+- Maximum one short line per comment — no paragraph blocks
+- Never describe what the code does (code shows that). Describe why it does it.
+
+  GOOD: // Tagada needs variation_id, not product_id — always send variation for variable products
+  GOOD: // WC returns flat list; grouped here so category filter UI works
+  BAD:  // This function maps over the products array and returns JSX for each product
+  BAD:  // set loading to true  (self-explanatory — no comment needed)
+
+## B5. Folder structure — never mix concerns
+
+  src/
+  ├── app/          → routes only (page.tsx, layout.tsx, loading.tsx, error.tsx)
+  ├── components/   → UI components, grouped by feature
+  │   ├── layout/   → Header, Footer, Nav
+  │   ├── shop/     → ProductCard, ProductGrid, CategoryFilter
+  │   ├── cart/     → CartItem, CartSummary, CartDrawer
+  │   ├── product/  → ProductImages, ProductInfo, BundleStepper
+  │   └── ui/       → Button, Badge, Spinner (generic reusables)
+  ├── lib/          → API clients and pure utility functions
+  ├── hooks/        → custom React hooks (useCart, useProduct, etc.)
+  ├── store/        → Zustand stores only
+  └── types/        → TypeScript interfaces only
+
+  RULES:
+  - app/        → calls components. NO inline JSX logic.
+  - lib/        → pure functions. NO React, NO hooks, NO JSX.
+  - components/ → receives props. NO direct fetch() calls.
+  - hooks/      → state and side effects. Calls lib/ for data.
+
+## B6. Naming conventions
+
+  Component file   → PascalCase          ProductCard.tsx
+  Hook file        → use + camelCase     useCart.ts
+  Lib/util file    → camelCase           woocommerce.ts, formatPrice.ts
+  Store file       → camelCase           cart.ts
+  Type/Interface   → PascalCase          Product, CartItem, WCVariation
+  Constant         → UPPER_SNAKE_CASE    WC_API_URL, REVALIDATE_SHOP
+  CSS              → Tailwind utilities only, no custom class names
+
+## B7. Page files must be thin — no logic inside
+- page.tsx = fetch data (if needed) + pass to component. Nothing else.
+- No business logic, no long JSX trees, no inline styles in page files.
+
+  GOOD:
+    // src/app/shop/page.tsx
+    import ProductGrid from "@/components/shop/ProductGrid"
+    import { getProducts } from "@/lib/woocommerce"
+    export default async function ShopPage() {
+      const products = await getProducts()
+      return <ProductGrid products={products} />
+    }
+
+## B8. TypeScript — no `any`, ever
+- All API response types in src/types/
+- Write the interface first, then write the function
+- If type is unknown: use `unknown` and narrow it — never `any`
+
+## B9. Server Components by default — `"use client"` only when required
+- Default: Server Component (no directive needed)
+- Add "use client" ONLY when the component uses: useState, useEffect, event handlers, Zustand
+- Cart, interactive buttons, drawers = client components
+- Product pages, shop listing, homepage sections = server components (faster load)
+
+## B10. Environment variables — two strict categories
+
+  NEXT_PUBLIC_ prefix  → visible in browser + server  → safe to expose (site URL, WP URL)
+  no prefix            → server only                   → secrets (WC keys, tokens)
+
+  NEVER use a secret key inside a Client Component ("use client" file)
+  API calls with secret keys → lib/ functions → called from Server Components or Route Handlers only
+
+# ─────────────────────────────────────────────
+# SECTION C: ONE SOURCE OF TRUTH (mandatory)
+# ─────────────────────────────────────────────
+
+## C1. Each concern has exactly one home
+
+  WooCommerce API calls    → src/lib/woocommerce.ts       (only file that calls WC REST)
+  WordPress REST calls     → src/lib/wordpress.ts         (menus, pages, homepage content)
+  Tagada checkout trigger  → src/lib/tagada.ts            (INIT_CHECKOUT payload builder)
+  Cart state               → src/store/cart.ts            (Zustand, localStorage persist)
+  Price formatting         → src/lib/formatPrice.ts       (currency display logic)
+  Attentive globals        → src/lib/attentive.ts         (attn_cart, attn_product, attn_order)
+  Auth/session             → src/lib/auth.ts              (JWT → WP user resolve)
+
+## C2. No scattered fetch() calls
+- If two places need the same data → extract to lib/ and import
+- Never duplicate an API call across components or pages
+
+# ─────────────────────────────────────────────
+# SECTION D: PERFORMANCE RULES
+# ─────────────────────────────────────────────
+
+## D1. ISR (Incremental Static Regeneration) for catalog pages
+- Shop listing page    → revalidate: 3600   (rebuild every 1 hour)
+- Product detail page  → revalidate: 3600
+- Homepage sections    → revalidate: 86400  (rebuild every 24 hours)
+- Cart / Checkout      → no cache, "use client", real-time only
+
+## D2. Images — next/image only, never <img>
+- Every image = <Image> from "next/image"
+- Add WordPress domain to next.config.ts images.remotePatterns
+- Always set width + height (or fill) to avoid layout shift
+
+## D3. Fonts — next/font only, never a <link> tag
+- Load all fonts via next/font/google (or next/font/local)
+- No Google Fonts <link> in layout.tsx or _document
+- This eliminates font-related layout shift and speeds up LCP
+
+# ─────────────────────────────────────────────
+# SECTION I: LOADING STATES & SKELETONS (MANDATORY — never ship a page without one)
+# Rule: a click must NEVER look ignored. The page changes at once, and grey
+#       skeleton holds the layout until the real data arrives.
+# ─────────────────────────────────────────────
+
+## I1. The contract — this is not optional
+
+  User clicks ANY link
+      → the new page opens IMMEDIATELY (never wait on the old page)
+      → its skeleton shows while the data loads
+      → the real content replaces the skeleton in the SAME layout
+
+  Never allowed:
+  - A blank white screen while data loads
+  - The old page frozen on screen after a click
+  - A bare spinner in the middle of an empty page
+  - An empty div used as a placeholder (e.g. <div className="min-h-[380px]" />)
+  - "No products found" / "Your cart is empty" shown BEFORE the data has loaded
+
+## I2. Every route needs a loading.tsx — no exceptions
+
+  src/app/<route>/loading.tsx  → renders that route's skeleton component
+
+  A route is NOT done until its loading.tsx exists. This is part of the task,
+  not a polish step for later. Add it in the SAME commit as the page.
+
+  Already built (keep them in sync when a page changes):
+    src/app/shop/loading.tsx            → ShopSkeleton
+    src/app/product/[slug]/loading.tsx  → ProductSkeleton
+    src/app/cart/loading.tsx            → CartHero + CartPageSkeleton
+
+  Still to add when those pages start fetching real data:
+    src/app/loading.tsx        (homepage — after P1-16)
+    src/app/coas/loading.tsx
+    src/app/checkout/loading.tsx
+    src/app/account/**/loading.tsx
+
+## I3. Client-side waits need a skeleton too
+
+  loading.tsx only covers server navigation. ALSO show a skeleton when:
+  - Reading the cart from localStorage (first client render)
+  - A fetch inside a hook is still running (totals, FBT suggestions, search)
+  - A "use client" component has data that is not ready yet
+
+  Pattern:
+    const hasMounted = useHasMounted();
+    if (!hasMounted) return <XyzSkeleton />;   // never an empty div
+
+## I4. Skeleton must MATCH the real layout, pixel for pixel
+
+- Copy the real component's wrapper classes: grid columns, gaps, padding, min-height
+- Same number of placeholder rows/cards as the page normally shows
+- Nothing may jump or resize when real data lands (zero layout shift)
+- Vary the bar widths (w-20 / w-24 / w-16) so it reads like text, not a barcode
+
+## I5. Build skeletons from the shared primitives — never hand-roll
+
+  src/components/ui/Skeleton.tsx   → one grey shimmering block (size via className)
+  src/components/ui/Spinner.tsx    → small ring, ONLY inside buttons
+
+  Rules:
+  - Never write a raw animated grey <div>; always use <Skeleton />
+  - One skeleton file per component, named <Component>Skeleton.tsx,
+    living next to the component it mirrors
+  - Skeleton files are Server Components — no "use client", no props, no logic
+
+## I6. Buttons that start work must say so
+
+- A button that triggers a request switches to a pending label + <Spinner />
+  (e.g. "Apply coupon" → "Checking…", "Update Cart" → "Updating…")
+- Disable it while pending so it cannot be double-clicked
+- NEVER let a pending state change an element's width in the header or nav —
+  that makes the menu twitch. Colour/label only, or position the spinner absolutely.
+
+## I7. Accessibility — a skeleton is not just a picture
+
+- Wrap each skeleton block in role="status" + aria-label="Loading <what>"
+- Put aria-busy={isLoading} on a box whose numbers are being re-checked
+- Every <Skeleton /> is aria-hidden already — do not announce each bar
+- Respect prefers-reduced-motion: the [data-skeleton] rule in globals.css stops
+  the shimmer, so never add a custom animation that ignores it
+
+## I8. Never fake slowness to "show" the skeleton
+
+- No artificial setTimeout, no disabling prefetch, no removing ISR caching
+- A fast page that skips the skeleton is CORRECT behaviour, not a bug
+- To test one: DevTools → Network → Slow 4G, or clear .next/cache and cold-load
+
+# ─────────────────────────────────────────────
+# SECTION E: WHAT NOT TO BUILD IN NEXT.JS
+# ─────────────────────────────────────────────
+
+## E1. Do NOT rebuild these — they run server-side and stay in WordPress
+- Points earning / expiry calculation (WPLoyalty)
+- Referral CPA tracking (Elixser Rewards v0.1/v0.2)
+- Coupon → Tagada promotion mirror (Elixser Rewards v0.3)
+- Guest order → account linking (Elixser Rewards v0.4)
+- WPC quantity pricing calculation
+- Wholesale role price calculation
+- Discount Rules cart calculation
+- Order creation / payment processing (Tagada handles this)
+
+## E2. These WordPress plugin FRONTENDS are dead — rebuild them in Next.js
+- WPLoyalty customer widget (points, rewards, referral URL display)
+- Elixser bundle stepper (1/2/3 vial tier swap)
+- Cart Abandonment Recovery UI (likely cut — Tagada does this)
+- Wholesale registration form
+- WiserReview widget per product page
+- Age / RUO gate (was a theme template + jQuery + admin-ajax — now Section J)
+
+# ─────────────────────────────────────────────
+# SECTION J: AGE / RUO GATE  ✅ BUILT
+# Ported from the WordPress theme (age-gate.php / .css / .js + kg_age_gate_* in functions.php).
+# Rule: the design is fixed — match age-gate.css value for value, never redesign it.
+# ─────────────────────────────────────────────
+
+## J1. What it does
+
+  A guest sees a full-screen lockout before anything else on the site. They give an
+  email, pick a field of research, and tick both acknowledgements (21+, research use
+  only). That creates a WooCommerce customer, signs them in, and the gate disappears.
+
+  There is NO close button and Escape does nothing. "Exit" leaves for google.com.
+
+## J2. Files — one job each
+
+  src/app/layout.tsx                  → reads the cookie, renders the gate for guests only
+  src/components/gate/AgeGate.tsx     → full-screen overlay, scroll lock, path check
+  src/components/gate/GateCard.tsx    → the dark panel: eyebrow, title, intro, footnote
+  src/components/gate/GateForm.tsx    → all form state and the submit
+  src/components/gate/GateField.tsx   → labelled control shell + shared control classes
+  src/components/gate/GateSelect.tsx  → research dropdown with its own chevron
+  src/components/gate/GateCheck.tsx   → acknowledgement row with the drawn tick
+  src/components/gate/GateSubmit.tsx  → the Confirm & enter button
+  src/components/gate/GateError.tsx   → red message, plus a sign-in link when taken
+  src/actions/ageGate.ts              → validates, registers, saves the session cookie
+  src/lib/ageGateCopy.ts              → every word, the research list, the exit URL
+  src/types/gate.ts                   → GateState
+
+## J3. Rules that must not be broken
+
+  - Who sees it is decided on the SERVER (layout reads the elx_session cookie). Never
+    move that to the client — the page would flash before the gate landed.
+  - /account stays open while gated, so somebody who already has a login can sign in.
+    GATE_OPEN_PATH in ageGateCopy.ts is the only place that path is written.
+  - RESEARCH_FIELDS values must stay in step with kg_get_research_field_options() in
+    the WordPress theme, and the meta key stays `field_of_research`. WordPress reads
+    both back on the user profile screen.
+  - The visitor never picks a password. One is generated and thrown away; they come
+    back through the magic link or a password reset.
+  - Do NOT hand the server action to <form action={...}>. React 19 blanks the fields
+    after every reply, which would wipe what the visitor typed when an email is taken.
+    Submit through startTransition instead (see GateForm).
+  - Gate colours live in globals.css as --color-gate-* tokens. No hex in a component.
+
+## J4. Pixel match — verified element by element against the live site
+
+  Every element's y-position and height was measured on elixserpeptides.com at
+  1440x900 and matches to 0.0px, card height included. Re-measure the same way
+  before claiming any change still matches.
+
+  Four traps that cost real time, because the live theme inherits a FIXED
+  line-height of 22.4px while globals.css uses a unitless 1.6:
+
+    eyebrow     needs leading-[22.4px]   (1.6 x 11px = 17.6 is 4.8px too short)
+    footnote    needs leading-[22.4px]   (1.6 x 10px = 16 is 6.4px too short)
+    field label needs leading-none       (live computes to exactly 13px)
+    button      needs leading-[normal]   NOT leading-normal — Tailwind's
+                                         leading-normal is 1.5, the CSS keyword
+                                         `normal` is ~1.2, a 4px difference
+
+  Two more, carried over from the live site on purpose:
+
+    - The title carries mt-2. The WP theme gives h2 an 8px margin-top that
+      age-gate.css never resets; Tailwind preflight does, so it is added back.
+    - The email box is SHORTER and greyer than the dropdown (padding 8px, radius
+      3px, border #666) because the theme's own input rule beats age-gate.css
+      there. GATE_INPUT copies it on purpose; GATE_SELECT keeps the real
+      age-gate.css look. If the client ever wants the two to match, point
+      GATE_INPUT at GATE_SELECT's values — one line.
+
+## J5. Known trade-off
+
+  Reading the cookie in the root layout turns every route from Static into Dynamic
+  (`ƒ` in the build output) — /shop, /coas and /research used to be prerendered.
+  Measured on a production build with a cold cache: the first request to /shop takes
+  ~3.9s and calls WordPress once, every request after it answers in ~30ms with no
+  WordPress call at all, until the hour is up. Site chrome (getGlobalData) is on
+  unstable_cache and asks WordPress once a week. So WordPress load is unchanged;
+  only the React render repeats. A gated site cannot be served statically anyway.
+
+# ─────────────────────────────────────────────
+# SECTION F: BUILD PHASES
+# ─────────────────────────────────────────────
+
+# STATUS KEY:  ⬜ TODO | 🔄 IN PROGRESS | ✅ DONE | ⏸ BLOCKED
+
+# ═══════════════════════════════════════════════
+# PHASE 1 — Core Store (build this first)
+# Pages: Homepage, Shop, Product, Cart, Checkout
+# ═══════════════════════════════════════════════
+
+## F1. Phase 1 — Task List
+
+  ⬜  P1-01  Project scaffold (Next.js 14, TypeScript, Tailwind, Zustand)
+  ⬜  P1-02  next.config.ts  (WP image domain, env vars)
+  ⬜  P1-03  Root layout — src/app/layout.tsx (Header + Footer wired)
+  ⬜  P1-04  Header component
+  ⬜  P1-05  Footer component
+  ⬜  P1-06  WooCommerce API client — src/lib/woocommerce.ts
+  ⬜  P1-07  Product types — src/types/product.ts
+  ⬜  P1-08  Shop page — src/app/shop/page.tsx + ProductGrid + ProductCard
+  ⬜  P1-09  Product detail page — src/app/shop/[slug]/page.tsx
+  ⬜  P1-10  Bundle stepper component (1/2/3 vial tier swap)
+  ⬜  P1-11  Zustand cart store — src/store/cart.ts  (localStorage persist)
+  ⬜  P1-12  Cart page — src/app/cart/page.tsx
+  ⬜  P1-13  Tagada checkout trigger — src/lib/tagada.ts
+  ⬜  P1-14  Checkout page — src/app/checkout/page.tsx (builds payload → redirects)
+  ⬜  P1-15  Return page — src/app/return/page.tsx  (?tgd_success=1, clear cart)
+  ⬜  P1-16  Homepage — src/app/page.tsx + homepage sections
+  ⬜  P1-17  End-to-end smoke test (cart → Tagada → order in Woo → return)
+
+## F2. Phase 1 — Plugins active on each page
+
+  HOMEPAGE (src/app/page.tsx)
+  ─────────────────────────────
+  - WordPress REST API         → page content, hero text, featured products
+  - WooCommerce REST API       → bestseller / featured product list
+  - Omnisend                   → email signup form (embed their JS snippet)
+  - Tidio                      → chat widget (load script in layout.tsx)
+  - Pixel Manager              → page_view event (GTM dataLayer push)
+
+  SHOP PAGE (src/app/shop/page.tsx)
+  ─────────────────────────────────
+  - WooCommerce REST API       → product list, categories, pagination
+  - Discount Rules for WC      → sale badge / promo badge on product card
+  - WPC Price by Quantity      → "buy 2 get X%" teaser on card (if applicable)
+  - WiserReview                → star rating display on product card
+  - Pixel Manager              → view_item_list event per product shown
+
+  PRODUCT DETAIL PAGE — PDP (src/app/shop/[slug]/page.tsx)
+  ──────────────────────────────────────────────────────────
+  - WooCommerce REST API       → product data, variations, images, description
+  - Elixser Rewards Custom     → bundle stepper (1/2/3 vial variation swap) ← rebuild required
+  - WPC Price by Quantity      → price-per-tier table (e.g. 1 vial $X, 2 vials $Y)
+  - Discount Rules for WC      → promo badge / savings display
+  - WiserReview                → review widget embed (their JS, keyed by product ID)
+  - WPLoyalty                  → "earn X points with this purchase" preview text
+  - Attentive                  → set window.attn_product global on page load
+  - Pixel Manager              → view_item event (product name, price, variant)
+
+  CART PAGE (src/app/cart/page.tsx)
+  ─────────────────────────────────
+  - Zustand store              → cart lines (variation_id + qty)
+  - Elixser Rewards Custom     → bundle stepper in cart (same component as PDP)
+  - WPLoyalty                  → show earned points total + apply reward coupon field
+  - Discount Rules for WC      → applied discount badge / savings amount
+  - Attentive                  → set window.attn_cart global on every cart change
+  - Pixel Manager              → view_cart event
+
+  CHECKOUT (src/app/checkout/page.tsx)
+  ─────────────────────────────────────
+  - Tagada lib                 → build INIT_CHECKOUT payload → redirect to Tagada
+  - Elixser Rewards v0.3       → loyalty coupon must be applied to Woo cart BEFORE redirect
+                                  so the WP hook mirrors it to Tagada promotions
+  - Tracking metadata          → pass tgd_tracking_meta cookies + utm params to Tagada
+
+  RETURN PAGE (src/app/return/page.tsx)  — shared handoff for ALL tracking
+  ──────────────────────────────────────
+  - Zustand store              → clear cart on arrival
+  - Attentive                  → set window.attn_order  (orderId, total, email, phone, items)
+  - Omnisend                   → fire purchase/conversion event
+  - Pixel Manager              → purchase event (use transaction_id to dedup)
+  - WPLoyalty                  → points confirmation message (read from /elx/v1/loyalty/me)
+
+## F3. Phase 1 — Plugin work NOT included (deferred to Phase 2+)
+
+  - WPLoyalty full widget (points dashboard, reward history, referral URL)
+  - Wholesale For WooCommerce registration form + tier pricing display
+  - Pixel Manager full server-side CAPI setup
+  - SEO migration (301 redirects, XML sitemap, full schema markup)
+  - Auth / JWT login + account pages
+  - WPLoyalty custom REST endpoint build (needed for loyalty widget)
+
+## F4. Phase 1 — Confirm before starting (spikes / blockers)
+
+  □  Tagada catalog has all ~138 Woo variation_ids synced
+  □  Tagada wholesale + quantity prices modelled on Tagada side (§3.1 risk)
+  □  Return page contract confirmed with Tagada (orderId, total, items, transaction_id)
+  □  WC REST API keys from client (Consumer Key + Secret, read-only scope)
+  □  WPGraphQL plugin installed on WordPress (if using GraphQL) — OR confirm Store API v1 available
+  □  WiserReview API endpoint for reading ratings (for SEO JSON-LD)
+
+# ═══════════════════════════════════════════════
+# PHASE 2 — Auth + Loyalty + Wholesale (after Phase 1 ships)
+# ═══════════════════════════════════════════════
+
+## F5. Phase 2 — Task List (do not start until Phase 1 ✅)
+
+  ⏸  P2-01  JWT auth — frontend done; BLOCKED until wp-graphql-jwt-authentication is installed
+  ✅  P2-02  Account pages — /account dashboard, orders, addresses, details, password reset
+  ✅  P2-07  Age / RUO gate — first-visit lockout, signs the visitor up (see J1)
+  ✅  P2-03  WPLoyalty custom REST endpoint — DONE (backend/elixser-loyalty-api.zip, live on new2.elixserpeptides.com)
+  ✅  P2-04  Loyalty widget (points balance, reward list, redeem, referral URL) — see Section K
+  ⬜  P2-05  Wholesale registration form + role-based price display
+  ⬜  P2-06  Pixel Manager server-side CAPI
+
+# ═══════════════════════════════════════════════
+# PHASE 3 — SEO + Polish + Launch
+# ═══════════════════════════════════════════════
+
+## F6. Phase 3 — Task List (do not start until Phase 2 ✅)
+
+  ⬜  P3-01  301 redirect map (all old WordPress URLs → new Next.js URLs)
+  ⬜  P3-02  XML sitemap generation
+  ⬜  P3-03  Schema markup (Product, AggregateRating, BreadcrumbList, Organization)
+  ⬜  P3-04  Full meta / Open Graph per page
+  ⬜  P3-05  Core Web Vitals audit + fixes
+  ⬜  P3-06  Client UAT + revisions
+  ⬜  P3-07  DNS cutover + go-live
+
+# ─────────────────────────────────────────────
+# SECTION K: LOYALTY WIDGET  ✅ BUILT
+# Points & Rewards page at /account/points
+# Design must match new2.elixserpeptides.com/my-account/wlr-rewards/ exactly
+# ─────────────────────────────────────────────
+
+## K1. Backend — Elixser Loyalty API plugin
+
+  FILE:    backend/elixser-loyalty-api.zip  (already uploaded live to new2.elixserpeptides.com)
+  PLUGIN:  "Elixser Loyalty API" — custom WP plugin wrapping WPLoyalty REST routes
+  SECRET:  ELX_LOYALTY_SECRET in .env.local must match ELX_LOYALTY_SECRET in wp-config.php
+           Currently empty in .env.local — fill it in or the X-Elx-Loyalty-Secret header is blank
+  BASE URL: {NEXT_PUBLIC_WP_URL}/wp-json/elx/v1/loyalty
+
+  ENDPOINTS (all need Bearer authToken OR email+secret):
+    GET  /me                          → LoyaltySummary (points, tier, rewards, referral, waysToEarn, settings)
+    GET  /history?page=&per_page=     → LoyaltyHistory (activity log)
+    GET  /coupons?type=active|expired → LoyaltyCoupons (claimed coupon codes)
+    POST /redeem                      → body: { reward_id, reward_table, points } → LoyaltyActionResult
+    POST /settings                    → body: { email_opt_in, birthday, campaign_id }
+    GET  /product-points?product_id=  → LoyaltyProductPoints (for product page earn line)
+    GET  /cart-points                 → LoyaltyCartPoints (for cart banner)
+
+## K2. Next.js files
+
+  src/lib/loyalty.ts                          → all calls to the plugin (server-only)
+  src/types/loyalty.ts                        → all TypeScript interfaces
+  src/app/account/points/page.tsx             → server page: calls API in parallel, passes to client
+  src/components/loyalty/PointsPageClient.tsx → main client component with tabs + redeem logic
+  src/components/loyalty/LoyaltySection.tsx   → shared section heading wrapper
+  src/components/loyalty/PointsCards.tsx      → MY POINTS: 3 stat cards (Available, Redeemed, Used)
+  src/components/loyalty/LevelProgress.tsx    → MY LEVELS: progress bar with tier names + gap text
+  src/components/loyalty/ReferralLink.tsx     → REFERRAL LINK: copy-to-clipboard input
+  src/components/loyalty/RewardCard.tsx       → REWARDS tab: catalogue item with "Redeem Now" button
+  src/components/loyalty/CouponCard.tsx       → COUPONS tab: claimed coupon + "Apply Coupon" button
+  src/components/loyalty/RecentActivities.tsx → RECENT ACTIVITIES: table of point history
+  src/components/loyalty/WaysToEarnCard.tsx   → WAYS TO EARN: campaign card grid (icon by actionType)
+  src/components/loyalty/RewardIcon.tsx       → SVG coin-in-hand icon used on reward/coupon cards
+  src/app/api/loyalty/redeem/route.ts         → POST — adds authToken server-side then calls plugin
+  src/app/api/loyalty/settings/route.ts       → POST — saves email opt-in / birthday
+
+## K3. Page sections (order matches the live WP widget)
+
+  1. MY POINTS        — 3 cards: Available Points, Redeemed Points, Used Rewards (with USD select)
+  2. MY LEVELS        — progress bar: current tier → next tier, gap sentence, 0–1000 axis
+  3. REFERRAL LINK    — read-only input with Copy Link button
+  4. MY REWARDS       — 3 tabs: Rewards | Coupons | Used & Expired Coupons
+  5. RECENT ACTIVITIES — table: Order No. / Action Type / Message / Points / Rewards
+  6. WAYS TO EARN REWARDS — grid of campaign cards, icon mapped from actionType
+  7. NOTIFICATION PREFERENCE — single checkbox: opt-in for points & rewards emails
+
+## K4. Redeem flow
+
+  - User clicks "Redeem Now" on a RewardCard
+  - POST /api/loyalty/redeem → WordPress creates WC coupon, returns { points, code }
+  - Client updates local points balance, switches tab to "Coupons"
+  - Page reloads to fetch the fresh coupon from the server
+
+## K5. Rules
+
+  - Never calculate points in Next.js — WordPress does all maths (WPLoyalty plugin)
+  - Never show 0 as balance if the API call failed — show a "not available" notice instead
+  - The loyalty API secret (ELX_LOYALTY_SECRET) is server-only — never NEXT_PUBLIC_
+  - Product earn line lives in src/components/product/EarnPointsLine.tsx (already exists)
+  - Cart banner lives in src/components/cart/LoyaltyBanner.tsx (already exists)
+
+## K6. Auth fix (session 2026-10-06)
+
+  FILE: src/lib/auth.ts  function getAuthToken()
+  CHANGE: when refreshAuthToken() throws (network error / timeout), return null instead of
+          throwing BackendUnreachableError. This shows the login form instead of the error boundary.
+  FILE: src/lib/refreshToken.ts
+  CHANGE: non-200 HTTP response from the JWT refresh endpoint now returns null (signed-out)
+          instead of throwing, so a 401/403 from WP doesn't look like "backend down".
+
+# ─────────────────────────────────────────────
+# SECTION L: PRODUCT REVIEWS (WiserReview)  ✅ BUILT (needs the plugin uploaded to WordPress)
+# WiserReview saves each product's rating + reviews in post meta `wiserrw_schema_json`.
+# We read that through our own endpoint — we never load WiserReview's widget script.
+# ─────────────────────────────────────────────
+
+## L1. Backend — Elixser Reviews API plugin  (documented per A8)
+
+  FILE:     backend/elixser-reviews-api.zip   (upload: WP Admin → Plugins → Add New → Upload)
+  NEEDS:    WiserReview plugin active, API key connected, Sync Products run once
+  ENDPOINT: GET {NEXT_PUBLIC_WP_URL}/wp-json/elx/v1/reviews?product_ids=12,34   (public, max 20 ids)
+  REPLIES:  { "12": { rating, count, reviews:[{author, body, rating}], writeReviewUrl } }
+  NOTE:     `reviews` holds only the reviews WiserReview put in its schema (first few), `count` is the real total.
+            No review date is sent — the schema does not carry one.
+
+## L2. Next.js files
+
+  src/types/review.ts                       → ProductReview, ProductReviews
+  src/lib/reviews.ts                        → the only fetch to the plugin (server-only, ISR 1 hour, tag "reviews")
+  src/lib/reviewFormat.ts                   → count label + the rating line under the title
+  src/lib/reviewSchema.ts                   → JSON-LD for Google stars (null when 0 reviews)
+  src/components/product/ReviewsSection.tsx → section shell + empty / "not available" states
+  src/components/product/ReviewsSummary.tsx → "4.5 ★★★★★ (3 reviews)"
+  src/components/product/ReviewCard.tsx     → one review
+  src/components/product/StarRow.tsx        → shared stars (title rating + review cards)
+  src/components/product/WriteReviewButton.tsx → opens the hosted WiserReview form in a new tab
+  src/components/product/ReviewJsonLd.tsx   → prints the JSON-LD script
+
+## L3. Rules
+
+  - Plugin unreachable → reviews = null → show "not available", never a false "no reviews yet".
+  - 0 reviews → the title rating keeps the old RATING default (productDefaults.ts); JSON-LD is skipped.
+  - Never calculate ratings in Next.js — WiserReview/WordPress own the numbers.
+
+# ─────────────────────────────────────────────
+# SECTION M: CONTACT FORM (Contact Form 7 + Flamingo)  ✅ BUILT
+# /contact form → Next.js server action → Contact Form 7 REST → mail + saved in Flamingo
+# No custom WordPress plugin, so nothing new to document under A8.
+# ─────────────────────────────────────────────
+
+## M1. Backend (WordPress, new2.elixserpeptides.com)
+
+  PLUGINS:  Contact Form 7 + Flamingo (Flamingo keeps every message: WP Admin → Flamingo → Inbound Messages)
+  FORM ID:  8764  (CF7_CONTACT_FORM_ID in .env.local — set it in Vercel/hosting env too)
+  FIELDS:   your-name, your-email, your-phone, your-message  (names must match src/lib/contactApi.ts)
+  MAIL:     set in the form's Mail tab (To, Reply-To [your-email]). Use an SMTP plugin on the live site.
+  ENDPOINT: POST {NEXT_PUBLIC_WP_URL}/wp-json/contact-form-7/v1/contact-forms/8764/feedback  (multipart, public)
+
+## M2. Next.js files
+
+  src/types/contactForm.ts                  → ContactFormValues, ContactFormState, Cf7FeedbackResponse
+  src/lib/contactApi.ts                     → the only fetch to Contact Form 7 (server-only)
+  src/actions/contact.ts                    → validates, bot trap, calls contactApi
+  src/components/contact/ContactForm.tsx    → form state + submit
+  src/components/contact/ContactSubmit.tsx  → button with "Sending…" + Spinner
+  src/components/contact/ContactStatus.tsx  → thank-you / error line
+
+## M3. Rules
+
+  - CF7 answers HTTP 200 even on failure — only status "mail_sent" means it worked.
+  - Submit through startTransition, never <form action> (React 19 blanks the fields — see J3).
+  - Hidden field `website` is the bot trap: filled = pretend success, send nothing.
+  - Renaming a field in the CF7 form breaks the mapping in contactApi.ts — change both together.
