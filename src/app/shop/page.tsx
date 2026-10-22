@@ -39,7 +39,7 @@ export default async function ShopPage() {
     <div className="min-h-screen">
       {/* Hero text */}
       <section className="md:block hidden bg-white px-[60px] pt-[16px] pb-0">
-      <PageHero title="The full catalog.111dsdsdsd" description="Every compound below is third-party tested by Optiq Health Labs Analytical, signed COA on every vial, made in the USA. Research use only." isShopPage={true} />
+      <PageHero title="The full cataloggggg." description="Every compound below is third-party tested by Optiq Health Labs Analytical, signed COA on every vial, made in the USA. Research use only." isShopPage={true} />
       </section>
       
       {/* Products */}
