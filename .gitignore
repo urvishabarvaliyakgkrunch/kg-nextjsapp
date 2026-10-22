@@ -45,6 +45,7 @@ Website_Issues_and_Fixes.pdf
 next-env.d.ts
 backend/
 
+#test
 # Internal working docs — kept locally, never deployed
 CART-CONTEXT.md
 CART-RECOVERY-BACKEND.md
